@@ -1,16 +1,8 @@
 @extends('components.layout')
 
-@section('title', 'Create New Product')
-
 @section('content')
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header -->
-    <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Create New Product</h1>
-        <p class="text-gray-600">Add a new product to your store</p>
-    </div>
-
-    <!-- Success Message -->
+    <!-- Success/Error Messages -->
     @if(session('success'))
     <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
         <div class="flex items-center">
@@ -22,10 +14,31 @@
     </div>
     @endif
 
-    <!-- Product Form -->
+    @if(session('error'))
+    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-red-800 font-medium">{{ session('error') }}</span>
+        </div>
+    </div>
+    @endif
+
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Edit Product</h1>
+        <p class="text-gray-600 mt-2">Update product information</p>
+    </div>
+
+    <!-- Form -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" class="p-8">
+        <form action="{{ route('products.update') }}" method="POST" enctype="multipart/form-data" class="p-8">
             @csrf
+            @method('PUT')
+
+            <!-- Hidden field for product ID -->
+            <input type="hidden" name="id" value="{{ $oldProduct['id'] }}">
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Left Column -->
@@ -39,7 +52,7 @@
                             type="text" 
                             id="name" 
                             name="name" 
-                            value="{{ old('name') }}"
+                            value="{{ old('name', $oldProduct['name']) }}"
                             required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors @error('name') border-red-500 @enderror"
                             placeholder="Enter product name"
@@ -62,7 +75,7 @@
                                 type="number" 
                                 id="price" 
                                 name="price" 
-                                value="{{ old('price') }}"
+                                value="{{ old('price', $oldProduct['price']) }}"
                                 step="0.01"
                                 min="0"
                                 required
@@ -88,7 +101,8 @@
                         >
                             <option value="">Select a category</option>
                             @foreach(['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports & Outdoors', 'Beauty & Personal Care', 'Toys & Games', 'Automotive', 'Health & Household', 'Jewelry'] as $category)
-                                <option value="{{ $category }}" {{ old('category') == $category ? 'selected' : '' }}>
+                                <option value="{{ $category }}" 
+                                    {{ old('category', $oldProduct['category']) == $category ? 'selected' : '' }}>
                                     {{ $category }}
                                 </option>
                             @endforeach
@@ -107,7 +121,7 @@
                             type="number" 
                             id="stock_quantity" 
                             name="stock_quantity" 
-                            value="{{ old('stock_quantity', 0) }}"
+                            value="{{ old('stock_quantity', $oldProduct['stock_quantity']) }}"
                             min="0"
                             required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors @error('stock_quantity') border-red-500 @enderror"
@@ -127,6 +141,16 @@
                             Product Image *
                         </label>
                         
+                        <!-- Current Image Preview -->
+                        @if($oldProduct['image'])
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600 mb-2">Current Image:</p>
+                            <img src="{{ $oldProduct['image'] }}" 
+                                 alt="Current product image" 
+                                 class="h-32 w-32 object-cover rounded-lg border border-gray-300">
+                        </div>
+                        @endif
+
                         <!-- File Upload -->
                         <div class="flex items-center justify-center w-full">
                             <label for="image" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors @error('image') border-red-500 @enderror">
@@ -137,7 +161,7 @@
                                     <p class="mb-2 text-sm text-gray-500">
                                         <span class="font-semibold">Click to upload</span> or drag and drop
                                     </p>
-                                    <p class="text-xs text-gray-500">PNG, JPG, JPEG, WEBP (MAX. 2MB, 2000x2000px)</p>
+                                    <p class="text-xs text-gray-500">PNG, JPG, JPEG, WEBP (MAX. 5MB)</p>
                                 </div>
                                 <input 
                                     id="image" 
@@ -145,7 +169,6 @@
                                     type="file" 
                                     class="hidden"
                                     accept="image/*"
-                                    required
                                 />
                             </label>
                         </div>
@@ -174,14 +197,14 @@
                                     id="in_stock" 
                                     name="in_stock" 
                                     value="1" 
-                                    {{ old('in_stock', true) ? 'checked' : '' }}
+                                    {{ old('in_stock', $oldProduct['in_stock']) ? 'checked' : '' }}
                                     class="sr-only"
                                 >
                                 <label 
                                     for="in_stock" 
-                                    class="block w-12 h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in-out {{ old('in_stock', true) ? 'bg-green-500' : '' }}"
+                                    class="block w-12 h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in-out {{ old('in_stock', $oldProduct['in_stock']) ? 'bg-green-500' : '' }}"
                                 >
-                                    <span class="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out transform {{ old('in_stock', true) ? 'translate-x-6' : '' }}"></span>
+                                    <span class="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out transform {{ old('in_stock', $oldProduct['in_stock']) ? 'translate-x-6' : '' }}"></span>
                                 </label>
                             </div>
                         </div>
@@ -200,14 +223,14 @@
                                     id="is_active" 
                                     name="is_active" 
                                     value="1" 
-                                    {{ old('is_active', true) ? 'checked' : '' }}
+                                    {{ old('is_active', $oldProduct['is_active'] ?? true) ? 'checked' : '' }}
                                     class="sr-only"
                                 >
                                 <label 
                                     for="is_active" 
-                                    class="block w-12 h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in-out {{ old('is_active', true) ? 'bg-blue-500' : '' }}"
+                                    class="block w-12 h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in-out {{ old('is_active', $oldProduct['is_active'] ?? true) ? 'bg-blue-500' : '' }}"
                                 >
-                                    <span class="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out transform {{ old('is_active', true) ? 'translate-x-6' : '' }}"></span>
+                                    <span class="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out transform {{ old('is_active', $oldProduct['is_active'] ?? true) ? 'translate-x-6' : '' }}"></span>
                                 </label>
                             </div>
                         </div>
@@ -216,7 +239,7 @@
                     <!-- New Image Preview -->
                     <div id="newImagePreview" class="hidden">
                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Image Preview
+                            New Image Preview
                         </label>
                         <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
                             <img 
@@ -226,7 +249,7 @@
                                 class="mx-auto max-h-48 rounded-lg hidden"
                             >
                             <p id="noNewPreview" class="text-gray-500 text-sm">
-                                Image preview will appear here
+                                New image preview will appear here
                             </p>
                         </div>
                     </div>
@@ -245,14 +268,14 @@
                     required
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none @error('description') border-red-500 @enderror"
                     placeholder="Enter product description"
-                >{{ old('description') }}</textarea>
+                >{{ old('description', $oldProduct['description']) }}</textarea>
                 @error('description')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Form Actions -->
-            <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-end">
+            <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-end border-t pt-6">
                 <a 
                     href="{{ route('products.index') }}" 
                     class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-center font-medium"
@@ -264,9 +287,9 @@
                     class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center"
                 >
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
-                    Create Product
+                    Update Product
                 </button>
             </div>
         </form>
@@ -336,23 +359,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Toggle switch styling
-    function setupToggle(toggleId, defaultColor = 'bg-green-500') {
+    function setupToggle(toggleId) {
         const toggleSwitch = document.getElementById(toggleId);
         const toggleLabel = toggleSwitch.nextElementSibling;
         
         toggleSwitch.addEventListener('change', function() {
             if (this.checked) {
-                toggleLabel.classList.add(defaultColor);
+                if (toggleId === 'in_stock') {
+                    toggleLabel.classList.add('bg-green-500');
+                } else {
+                    toggleLabel.classList.add('bg-blue-500');
+                }
                 toggleLabel.classList.remove('bg-gray-300');
             } else {
-                toggleLabel.classList.remove(defaultColor);
+                toggleLabel.classList.remove('bg-green-500', 'bg-blue-500');
                 toggleLabel.classList.add('bg-gray-300');
             }
         });
     }
 
-    setupToggle('in_stock', 'bg-green-500');
-    setupToggle('is_active', 'bg-blue-500');
+    setupToggle('in_stock');
+    setupToggle('is_active');
 });
 </script>
 @endsection
