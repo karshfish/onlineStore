@@ -8,7 +8,7 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
             <div>
                 <h1 class="text-4xl font-extrabold text-blue-800 mb-2">Shop by Category</h1>
-                <p class="text-blue-600 text-sm">Browse top categories — just like Amazon.</p>
+                <p class="text-blue-600 text-sm">Browse top categories.</p>
             </div>
             <a href="{{ route('categories.create') }}"
                class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-full shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300">
