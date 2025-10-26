@@ -69,7 +69,8 @@
                     </div>
                     <div>
                         <span class="font-semibold">Created:</span>
-                        {{ $product->created_at->format('M d, Y') }}
+                        {{ $product?->created_at ? $product->created_at->format('M d, Y') : 'N/A' }}
+
                     </div>
                 </div>
                 
@@ -102,6 +103,90 @@
                     </a>
                 </div>
             </div>
+            <!-- Comments Section -->
+<div class="mt-10 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">
+        Comments ({{ $product->comments->count() }})
+    </h2>
+
+    {{-- Success & Error Messages --}}
+    @if(session('success'))
+        <div class="mb-4 p-3 bg-green-50 text-green-700 border border-green-200 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>• {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    {{-- List Comments --}}
+    @forelse($product->comments as $comment)
+        <div class="border-b border-gray-200 pb-3 mb-3">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="font-semibold text-gray-800">{{ $comment->author_name }}</p>
+                    <p class="text-sm text-gray-500">{{ $comment->author_email }}</p>
+                </div>
+                <form action="{{ route('comments.destroy', $comment->id) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-red-600 hover:underline text-sm">
+                        Delete
+                    </button>
+                </form>
+            </div>
+            <p class="mt-2 text-gray-700">{{ $comment->content }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ $comment->created_at->diffForHumans() }}</p>
+        </div>
+    @empty
+        <p class="text-gray-500 italic">No comments yet. Be the first to comment!</p>
+    @endforelse
+
+    {{-- Comment Form --}}
+    <form action="{{ route('comments.store', $product->id) }}" method="POST" class="mt-6 space-y-4">
+        @csrf
+        <input type="hidden" name="commentable_type" value="{{ get_class($product) }}">
+
+        <input type="hidden" name="commentable_id" value="{{ $product->id }}">
+
+        <div>
+            <label for="author_name" class="block text-sm font-semibold text-gray-700 mb-1">Your Name</label>
+            <input type="text" id="author_name" name="author_name" value="{{ old('author_name') }}" 
+                   class="w-full border-gray-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <div>
+            <label for="author_email" class="block text-sm font-semibold text-gray-700 mb-1">Your Email</label>
+            <input type="email" id="author_email" name="author_email" value="{{ old('author_email') }}" 
+                   class="w-full border-gray-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <div>
+            <label for="content" class="block text-sm font-semibold text-gray-700 mb-1">Your Comment</label>
+            <textarea id="content" name="content" rows="3" 
+                      class="w-full border-gray-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500">{{ old('content') }}</textarea>
+        </div>
+
+        <button type="submit" 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium transition-colors">
+            Post Comment
+        </button>
+    </form>
+</div>
+
         </div>
     </div>
 </div>

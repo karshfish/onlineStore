@@ -67,7 +67,8 @@ class ProductController extends Controller
 
         // Get paginated results (20 products per page)
         $products = $query->paginate(20)->withQueryString();
-
+        //add comments count to each products
+        $products = $query->withCount('comments')->paginate(20)->withQueryString();
         // Get all categories for filter dropdown
         $categories = Product::distinct()->pluck('category')->sort();
 
@@ -251,21 +252,12 @@ class ProductController extends Controller
     public function destroy() //delete product
     {}
 
-    public function show($id)
+    public function show(Product $product)
     {
-        // $key = array_search($id, array_column($this->products, 'id'));
+        $product->load('comments');
 
-        // if ($key === false) {
-        //     abort(404);
-        // }
+        $title = $product->title ?? $product->name;
 
-        $product = Product::findOrFail($id);
-        // dd($product);
-        return view('products.show', [
-            'title' => $product['title'] ?? $product['name'],
-            'product' => $product
-        ]);
-        return view('products.index');
-    } //show function
-
+        return view('products.show', compact('product', 'title'));
+    }
 }
