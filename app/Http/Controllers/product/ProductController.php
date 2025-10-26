@@ -15,7 +15,12 @@ use PDOException;
 class ProductController extends Controller
 {
 
-    public function __construct() {}
+    public function __construct()
+    {
+        // Apply middleware to only specific methods
+        $this->middleware('auth')->only('create', 'store', 'update', 'edit');
+        $this->middleware('product.limit')->only(['create', 'store']);
+    }
 
 
 

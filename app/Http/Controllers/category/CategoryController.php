@@ -13,6 +13,12 @@ use App\Models\Product;
 
 class CategoryController extends Controller
 {
+    public function __construct()
+    {
+        // Apply middleware to only specific methods
+        $this->middleware('auth')->only('create', 'store', 'update', 'edit');
+        $this->middleware('product.limit')->only(['create', 'store']);
+    }
     /**
      * Display a listing of the resource.
      */
