@@ -4,6 +4,8 @@ namespace App\Http\Controllers\product;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -97,33 +99,9 @@ class ProductController extends Controller
     }
 
 
-    public function store(Request $request) // store new record
+    public function store(StoreProductRequest $request) // store new record
     {
-
-
-        $validData = $request->validate(
-            [
-                'name' => 'required|string|min:3',
-                'description' => 'required|string|min:10',
-                'price' => 'required|numeric|min:0',
-                'category' => 'required|string|in:Electronics,Clothing,Books,Home & Garden,Sports & Outdoors,Beauty & Personal Care,Toys & Games,Automotive,Health & Household,Jewelry',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048|dimensions:max_width=2000,max_height=2000', // 2MB max
-                'brand' => 'nullable|string|max:255',
-                'stock_quantity' => 'required|integer|min:0',
-                'in_stock' => 'sometimes|boolean',
-                'is_active' => 'sometimes|boolean',
-
-            ],
-            [
-                'image.required' => 'The product image is required.',
-                'image.image' => 'The file must be an image.',
-                'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, webp.',
-                'image.max' => 'The image may not be greater than 2MB.',
-                'name.min' => 'The product name must be at least 3 characters.',
-                'description.min' => 'The description must be at least 10 characters.',
-            ]
-        );
-
+        $validData = $request->validated();
         // Handle image
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -170,32 +148,11 @@ class ProductController extends Controller
 
 
 
-    public function update(Request $request) //update the product
+    public function update(UpdateProductRequest $request) //update the product
     {
         $product = Product::findOrFail($request->id);
 
-        $validData = $request->validate(
-            [
-                'name' => 'required|string|min:3',
-                'description' => 'required|string|min:10',
-                'price' => 'required|numeric|min:0',
-                'category' => 'required|string|in:Electronics,Clothing,Books,Home & Garden,Sports & Outdoors,Beauty & Personal Care,Toys & Games,Automotive,Health & Household,Jewelry',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048|dimensions:max_width=7000,max_height=7000', // 2MB max
-                'brand' => 'nullable|string|max:255',
-                'stock_quantity' => 'required|integer|min:0',
-                'in_stock' => 'sometimes|boolean',
-                'is_active' => 'sometimes|boolean',
-
-            ],
-            [
-                'image.required' => 'The product image is required.',
-                'image.image' => 'The file must be an image.',
-                'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, webp.',
-                'image.max' => 'The image may not be greater than 2MB.',
-                'name.min' => 'The product name must be at least 3 characters.',
-                'description.min' => 'The description must be at least 10 characters.',
-            ]
-        );
+        $validData = $request->validated();
 
         // Handle image
         if ($request->hasFile('image')) {
