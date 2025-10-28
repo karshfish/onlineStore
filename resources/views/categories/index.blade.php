@@ -1,4 +1,4 @@
-@extends('components.layout')
+@extends('layouts.app')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-100 py-16">

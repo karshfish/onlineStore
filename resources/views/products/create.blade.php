@@ -1,4 +1,4 @@
-@extends('components.layout')
+@extends('layouts.app')
 
 @section('title', 'Create New Product')
 

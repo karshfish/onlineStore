@@ -1,10 +1,25 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\category\CategoryController;
 use App\Http\Controllers\product\ProductController;
 use App\Http\Controllers\product\CommentController;
 use Illuminate\Support\Facades\Route;
+//breeze routes
+Route::get('/', function () {
+    return view('welcome');
+});
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+//custome routes for the app
 Route::redirect('/', '/categories');
 //Product routes
 Route::get('/products', ProductController::class . '@index')->name('products.index');
@@ -18,3 +33,4 @@ Route::resource('categories', CategoryController::class);
 //comments routes it will be for the products only now but it can be used for any model passed to it
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+require __DIR__ . '/auth.php';
