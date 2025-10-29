@@ -4,13 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @mixin IdeHelperCategory
  */
 class Category extends Model
 {
+    use SoftDeletes;
     use HasFactory;
+    protected $dates = ['deleted_at'];
     protected $fillable = ['name', 'description', 'image', 'is_active'];
     public function products()
     {

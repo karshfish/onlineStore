@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-
-
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header with Search and Create Button -->
@@ -10,14 +8,15 @@
             <!-- Title and Create Button -->
             <div class="flex items-center gap-4">
                 <h1 class="text-3xl font-bold text-gray-900">Our Products</h1>
-                <!-- Create New Product Button -->
-<a href="{{ route('products.create') }}" 
-   class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
-    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-    </svg>
-    New Product
-</a>
+
+                <!-- New Product Button (Using Reusable Component) -->
+                <x-button 
+                    :url="route('products.create')" 
+                    type="primary" 
+                    icon="plus"
+                >
+                    New Product
+                </x-button>
             </div>
 
             <!-- Search Bar -->
@@ -35,7 +34,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
-                    <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    <button 
+                        type="submit" 
+                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
                         Search
                     </button>
                 </form>
@@ -45,7 +46,6 @@
         <!-- Filters -->
         <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
             <form action="{{ route('products.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <!-- Hidden search field to preserve search -->
                 <input type="hidden" name="search" value="{{ $filters['search'] ?? '' }}">
 
                 <!-- Category Filter -->
@@ -64,24 +64,38 @@
                 <!-- Price Range -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Min Price</label>
-                    <input type="number" name="min_price" value="{{ $filters['min_price'] ?? '' }}" 
-                           placeholder="0.00" step="0.01" min="0"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    <input 
+                        type="number" 
+                        name="min_price" 
+                        value="{{ $filters['min_price'] ?? '' }}" 
+                        placeholder="0.00" 
+                        step="0.01" 
+                        min="0"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
-                    <input type="number" name="max_price" value="{{ $filters['max_price'] ?? '' }}" 
-                           placeholder="1000.00" step="0.01" min="0"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    <input 
+                        type="number" 
+                        name="max_price" 
+                        value="{{ $filters['max_price'] ?? '' }}" 
+                        placeholder="1000.00" 
+                        step="0.01" 
+                        min="0"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <!-- Stock & Sort -->
                 <div class="flex flex-col gap-2">
                     <div class="flex items-center">
-                        <input type="checkbox" id="in_stock" name="in_stock" value="1" 
-                               {{ ($filters['in_stock'] ?? '') ? 'checked' : '' }}
-                               class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <input 
+                            type="checkbox" 
+                            id="in_stock" 
+                            name="in_stock" 
+                            value="1" 
+                            {{ ($filters['in_stock'] ?? '') ? 'checked' : '' }}
+                            class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                         <label for="in_stock" class="text-sm text-gray-700">In Stock Only</label>
                     </div>
                     
@@ -99,12 +113,8 @@
 
                 <!-- Filter Actions -->
                 <div class="md:col-span-4 flex gap-2 justify-end pt-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                        Apply Filters
-                    </button>
-                    <a href="{{ route('products.index') }}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                        Clear All
-                    </a>
+                    <x-button type="primary">Apply Filters</x-button>
+                    <x-button :url="route('products.index')" type="secondary">Clear All</x-button>
                 </div>
             </form>
         </div>
@@ -130,9 +140,9 @@
             </svg>
             <h3 class="text-lg font-medium text-gray-900 mb-2">No products found</h3>
             <p class="text-gray-500 mb-4">Try adjusting your search terms or filters</p>
-            <a href="{{ route('products.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            <x-button :url="route('products.index')" type="primary">
                 Clear Filters
-            </a>
+            </x-button>
         </div>
     @endif
 </div>

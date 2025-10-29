@@ -48,7 +48,8 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'profile_image' => $path
+            'profile_image' => $path,
+            'role' => 'client'
         ]);
 
         // Handle image upload (if provided)

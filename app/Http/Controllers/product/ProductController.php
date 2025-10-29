@@ -210,9 +210,40 @@ class ProductController extends Controller
         }
     }
 
+    public function trash()
+    {
+        $deletedProducts = Product::onlyTrashed()->get();
 
-    public function destroy() //delete product
-    {}
+        return view('products.trash', compact('deletedProducts'));
+    }
+
+
+    public function destroy($id, Request $request)
+    {
+        $product = Product::findOrFail($id);
+
+
+        $product->delete();
+        return redirect()
+            ->route('products.index')
+            ->with('status', [
+                'message' => "Product <strong>{$product->name}</strong> deleted successfully.",
+                'undo_url' => route('products.restore', $product->id),
+            ]);
+    }
+
+    public function restore($id)
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+        $this->authorize('restore', $product); // policy check
+
+        try {
+            $product->restore();
+            return redirect()->back()->with('success', 'Product restored.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to restore product.');
+        }
+    }
 
     public function show(Product $product)
     {

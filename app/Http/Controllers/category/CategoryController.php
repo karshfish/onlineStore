@@ -166,4 +166,16 @@ class CategoryController extends Controller
     {
         //
     }
+    public function restore($id)
+    {
+        $category = Category::withTrashed()->findOrFail($id);
+        $this->authorize('restore', $category); // policy check
+
+        try {
+            $category->restore();
+            return redirect()->back()->with('success', 'Category restored.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to restore category.');
+        }
+    }
 }

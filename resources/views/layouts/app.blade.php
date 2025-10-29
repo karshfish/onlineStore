@@ -33,6 +33,13 @@
                         <a href="{{ url('/products') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-blue-50">Products</a>
                         <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-blue-50">About</a>
                         <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-blue-50">Contact</a>
+                     @auth
+                    @if(auth()->user()->role === 'admin')
+                        <a href="{{ route('products.trash') }}" class="text-red-600 font-semibold hover:underline">
+                            View Deleted Products
+                        </a>
+                     @endif
+                    @endauth
                     </div>
 
                     

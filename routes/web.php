@@ -28,8 +28,17 @@ Route::post('/product/store', ProductController::class . '@store')->name('produc
 Route::get('/products/{product}', ProductController::class . '@show')->name('products.show');
 Route::get('/products/{id}/edit', ProductController::class . '@edit')->name('products.edit');
 Route::put('/products/update', ProductController::class . '@update')->name('products.update');
+Route::delete('delete/products/{id}', ProductController::class . '@destroy')->name('products.destroy')->middleware(['auth', 'role:admin']);
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('trash/products', [ProductController::class, 'trash'])->name('products.trash');
+    Route::post('/products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
+});
+
 // resource controller for categories
 Route::resource('categories', CategoryController::class);
+Route::patch('admin/categories/{id}/restore', [CategoryController::class, 'restore'])
+    ->name('admin.categories.restore')
+    ->middleware(['auth', 'role:admin']);
 //comments routes it will be for the products only now but it can be used for any model passed to it
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');

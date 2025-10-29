@@ -24,7 +24,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'profile_image'
+        'profile_image',
+        'role'
     ];
 
     /**
@@ -63,5 +64,17 @@ class User extends Authenticatable
         return $this->profile_image
             ? asset('storage/' . $this->profile_image)
             : asset('images/default-profile.png');
+    }
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+    public function isManager()
+    {
+        return $this->role === 'manager';
+    }
+    public function isClient()
+    {
+        return $this->role === 'client';
     }
 }

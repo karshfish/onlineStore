@@ -31,7 +31,13 @@
                         <a href="{{ url('/') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-blue-50">Home</a>
                         <a href="{{ url('/products') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-blue-50">Products</a>
                         <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-blue-50">About</a>
-                        <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-blue-50">Contact</a>
+                       
+                        <a href="{{ route('products.trash') }}" class="text-red-600 font-semibold hover:underline">
+                            View Deleted Products
+                        </a> <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-blue-50">Contact</a>
+           
+            
+
                     </div>
 
                     <div class="flex items-center space-x-4">
@@ -50,6 +56,25 @@
                 </div>
             </div>
         </nav>
+@if(session('status'))
+    @php $status = session('status'); @endphp
+    <div class="fixed top-4 right-4 bg-white border border-gray-200 shadow-xl rounded-xl px-6 py-4 flex items-center gap-3 z-50 animate-fade-in-down">
+        <i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
+        <div class="flex flex-col text-sm">
+            <div class="font-semibold text-gray-800">{!! $status['message'] !!}</div>
+            @if(!empty($status['undo_url']))
+                <form action="{{ $status['undo_url'] }}" method="POST" class="mt-1">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="text-blue-600 font-medium hover:underline">Undo</button>
+                </form>
+            @endif
+        </div>
+        <button onclick="this.parentElement.remove()" class="ml-4 text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+@endif
 
         <main class="flex-1">
             @yield('content')
